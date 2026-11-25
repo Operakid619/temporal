@@ -32,3 +32,19 @@ func TestWildCardStringsToRegexp(t *testing.T) {
 	require.NoError(t, err)
 	require.NotRegexp(t, re, "a")
 }
+
+
+func TestWildCardAlternativesMatchWholeString(t *testing.T) {
+	t.Parallel()
+
+	re, err := util.WildCardStringsToRegexp([]string{"alpha", "b*ta"})
+	require.NoError(t, err)
+	for _, input := range []string{"alpha-suffix", "prefix-beta", "prefix-alpha", "beta-suffix"} {
+		t.Run(input, func(t *testing.T) {
+			t.Parallel()
+			require.NotRegexp(t, re, input)
+		})
+	}
+	require.Regexp(t, re, "alpha")
+	require.Regexp(t, re, "beta")
+}
